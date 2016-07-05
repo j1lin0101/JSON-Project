@@ -48,7 +48,6 @@ class ViewController: UIViewController {
                     self.json = JSON(value)
                     let randomMovieData = self.json!["feed"]["entry"][Int(arc4random_uniform(UInt32(25)))]
                     self.randomMovie = Movie(json: randomMovieData)
-                    print(self.randomMovie?.link)
                     self.movieTitleLabel.text = self.randomMovie!.name
                     self.rightsOwnerLabel.text = self.randomMovie!.rightsOwner
                     self.releaseDateLabel.text = self.randomMovie!.releaseDate
@@ -72,12 +71,21 @@ class ViewController: UIViewController {
     }
     
     @IBAction func viewOniTunesPressed(sender: AnyObject) {
-        UIApplication.sharedApplication().openURL(NSURL(string: randomMovie!.link)!)
-//        if isButtonAvailable {
-//            UIApplication.sharedApplication().openURL(NSURL(string: randomMovie!.link)!)
-//        }
-        
+        if isButtonAvailable {
+            UIApplication.sharedApplication().openURL(NSURL(string: randomMovie!.link)!)
+        }
     }
     
+    @IBAction func refreshButtonPressed(sender: AnyObject) {
+        if isButtonAvailable {
+            let randomMovieData = self.json!["feed"]["entry"][Int(arc4random_uniform(UInt32(25)))]
+            self.randomMovie = Movie(json: randomMovieData)
+            self.movieTitleLabel.text = self.randomMovie!.name
+            self.rightsOwnerLabel.text = self.randomMovie!.rightsOwner
+            self.releaseDateLabel.text = self.randomMovie!.releaseDate
+            self.priceLabel.text = String(self.randomMovie!.price)
+            self.loadPoster(self.randomMovie!.poster)
+        }
+    }
 }
 
