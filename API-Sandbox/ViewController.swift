@@ -12,6 +12,7 @@ import Alamofire
 import AlamofireImage
 import AlamofireNetworkActivityIndicator
 
+
 class ViewController: UIViewController {
 
     @IBOutlet weak var movieTitleLabel: UILabel!
@@ -20,13 +21,23 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var posterImageView: UIImageView!
     
+    var json: JSON?
+    var isButtonAvailable = false
+    var randomMovie: Movie? {
+        didSet {
+            if randomMovie != nil {
+                isButtonAvailable = true
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        exerciseOne()
-        exerciseTwo()
-        exerciseThree()
+//        exerciseOne()
+//        exerciseTwo()
+//        exerciseThree()
         
         let apiToContact = "https://itunes.apple.com/us/rss/topmovies/limit=25/json"
         // This code will call the iTunes top 25 movies endpoint listed above
@@ -34,12 +45,15 @@ class ViewController: UIViewController {
             switch response.result {
             case .Success:
                 if let value = response.result.value {
-                    let json = JSON(value)
-                    
-                    // Do what you need to with JSON here!
-                    // The rest is all boiler plate code you'll use for API requests
-                    
-                    
+                    self.json = JSON(value)
+                    let randomMovieData = self.json!["feed"]["entry"][Int(arc4random_uniform(UInt32(25)))]
+                    self.randomMovie = Movie(json: randomMovieData)
+                    print(self.randomMovie?.link)
+                    self.movieTitleLabel.text = self.randomMovie!.name
+                    self.rightsOwnerLabel.text = self.randomMovie!.rightsOwner
+                    self.releaseDateLabel.text = self.randomMovie!.releaseDate
+                    self.priceLabel.text = String(self.randomMovie!.price)
+                    self.loadPoster(self.randomMovie!.poster)
                 }
             case .Failure(let error):
                 print(error)
@@ -58,6 +72,10 @@ class ViewController: UIViewController {
     }
     
     @IBAction func viewOniTunesPressed(sender: AnyObject) {
+        UIApplication.sharedApplication().openURL(NSURL(string: randomMovie!.link)!)
+//        if isButtonAvailable {
+//            UIApplication.sharedApplication().openURL(NSURL(string: randomMovie!.link)!)
+//        }
         
     }
     
